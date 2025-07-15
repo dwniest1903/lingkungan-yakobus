@@ -1,0 +1,25 @@
+
+:root {
+  --bg-light: #fffdf7;
+  --bg-dark: #2c2c2c;
+  --card-light: #ffffff;
+  --card-dark: #3a3a3a;
+  --text-light: #3e2f20;
+  --text-dark: #f8f8f8;
+  --primary: #00796b;
+  --primary-dark: #004d40;
+  --danger: #e53935;
+  --danger-dark: #b71c1c;
+  --accent-light: #ffcc80;
+  --accent-dark: #616161;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background: var(--bg-light);
+  color: var(--text-light);
+  transition: all 0.5s ease;
+}
+
+/* Potongan - disingkat agar tidak terlalu panjang. Sisanya ditambahkan nanti. */
