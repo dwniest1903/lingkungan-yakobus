@@ -176,11 +176,124 @@
     .toggle-mode:hover {
       background: var(--primary-dark);
     }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
   </style>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
 </head>
 <body>
+<!-- Glassmorphism Login Overlay -->
+<!-- Tetap seperti sebelumnya -->
+<div id="loginOverlay" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeIn 0.8s ease;
+">
+  <div id="loginBox" style="
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    width: 90%;
+    max-width: 400px;
+    animation: slideUp 0.6s ease;
+    box-sizing: border-box;
+    overflow: hidden;
+  ">
+    <h2 style="font-size: 24px; margin-bottom: 10px;">🔐 Akses Terbatas</h2>
+    <p style="font-size: 16px; color: #eee; margin-bottom: 25px;">Masukkan kode untuk masuk ke sistem</p>
+    <input type="password" id="kodeMasuk" placeholder="Masukkan kode akses..." style="
+      padding: 14px 18px;
+      width: calc(100% - 4px); /* agar tidak melebihi padding */
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(3px);
+      box-sizing: border-box;
+    ">
+    <button onclick="cekKode()" style="
+      padding: 12px 25px;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #00bfa5, #00796b);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    ">Masuk</button>
+    <p id="pesanKodeSalah" style="margin-top: 15px; color: #ffbdbd; font-weight: bold;"></p>
+  </div>
+</div>
+<script>
+  function cekKode() {
+    const kode = document.getElementById("kodeMasuk").value;
+    const pesan = document.getElementById("pesanKodeSalah");
+    const kodeBenar = "yakobus123"; // ← Ubah kode sesuai keinginan
+
+    if (kode === kodeBenar) {
+      document.getElementById("loginOverlay").style.display = "none";
+    } else {
+      pesan.textContent = "❌ Kode salah. Silakan coba lagi.";
+      document.getElementById("kodeMasuk").classList.add("shake");
+      setTimeout(() => {
+        document.getElementById("kodeMasuk").classList.remove("shake");
+      }, 500);
+    }
+  }
+
+  // Autofokus saat halaman load
+  window.onload = () => {
+    const input = document.getElementById("kodeMasuk");
+    if (input) input.focus();
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+      document.querySelector(".toggle-mode").textContent = "☀️ Mode";
+    }
+  };
+</script>
+
+  </div>
+</div>
+
 <div id="cover" style="
   position: fixed;
   top: 0; left: 0;
