@@ -179,6 +179,117 @@
   </style>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
+
+<!-- Firebase SDKs -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const transaksiCol = collection(db, "transaksi");
+  const saldoCol = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function ambilDataFirestore() {
+    const querySnapshot = await getDocs(transaksiCol);
+    data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+
+    const saldoSnapshot = await getDocs(saldoCol);
+    saldoAwalTahun = {};
+    saldoSnapshot.forEach((doc) => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    populateTahunFilter();
+    updateTabel();
+  }
+
+  async function simpanSaldoAwal() {
+    const tahun = document.getElementById("tahunFilter").value;
+    const jumlah = parseInt(document.getElementById("saldoAwal").value) || 0;
+    if (!tahun) return alert("Pilih tahun terlebih dahulu");
+    await setDoc(doc(saldoCol, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiCol, obj);
+    ambilDataFirestore();
+  }
+
+  async function hapusTransaksiFirestore(id) {
+    await deleteDoc(doc(transaksiCol, id));
+    ambilDataFirestore();
+  }
+
+  function populateTahunFilter() {
+    const tahunSet = new Set();
+    data.forEach(item => {
+      const tahun = new Date(item.tanggal).getFullYear();
+      tahunSet.add(tahun);
+    });
+    const tahunFilter = document.getElementById('tahunFilter');
+    tahunFilter.innerHTML = '';
+    [...tahunSet].sort().forEach(tahun => {
+      const option = document.createElement('option');
+      option.value = tahun;
+      option.textContent = tahun;
+      tahunFilter.appendChild(option);
+    });
+  }
+
+  function hapusTransaksi(index) {
+    const id = data[index].id;
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksiFirestore(id);
+    }
+  }
+
+  document.getElementById("formTransaksi").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) {
+      alert("Harap lengkapi semua data!");
+      return;
+    }
+
+    tambahTransaksi({ nama, tanggal, keterangan, jenis, jumlah });
+    this.reset();
+  });
+
+  document.getElementById("bulanFilter").addEventListener('change', updateTabel);
+  document.getElementById("tahunFilter").addEventListener('change', updateTabel);
+
+  ambilDataFirestore();
+
+  window.getData = () => data;
+  window.getSaldoAwal = () => saldoAwalTahun;
+</script>
+
+
 </head>
 <body>
 <div id="cover" style="
@@ -360,7 +471,117 @@
 
   <!-- Tambahkan script transaksi, simpanSaldoAwal, populateTahunFilter, updateTabel, hapusTransaksi, dan tampilkanRekap seperti di versi sebelumnya -->
   <!-- Jika kamu ingin saya langsung lengkapi semua JS transaksi dan rekapnya di bawah sini juga, beri tahu ya. -->
-<!-- Tambahan ini berada sebelum </body> -->
+<!-- Tambahan ini berada sebelum 
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const transaksiCol = collection(db, "transaksi");
+  const saldoCol = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function ambilDataFirestore() {
+    const querySnapshot = await getDocs(transaksiCol);
+    data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+
+    const saldoSnapshot = await getDocs(saldoCol);
+    saldoAwalTahun = {};
+    saldoSnapshot.forEach((doc) => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    populateTahunFilter();
+    updateTabel();
+  }
+
+  async function simpanSaldoAwal() {
+    const tahun = document.getElementById("tahunFilter").value;
+    const jumlah = parseInt(document.getElementById("saldoAwal").value) || 0;
+    if (!tahun) return alert("Pilih tahun terlebih dahulu");
+    await setDoc(doc(saldoCol, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiCol, obj);
+    ambilDataFirestore();
+  }
+
+  async function hapusTransaksiFirestore(id) {
+    await deleteDoc(doc(transaksiCol, id));
+    ambilDataFirestore();
+  }
+
+  function populateTahunFilter() {
+    const tahunSet = new Set();
+    data.forEach(item => {
+      const tahun = new Date(item.tanggal).getFullYear();
+      tahunSet.add(tahun);
+    });
+    const tahunFilter = document.getElementById('tahunFilter');
+    tahunFilter.innerHTML = '';
+    [...tahunSet].sort().forEach(tahun => {
+      const option = document.createElement('option');
+      option.value = tahun;
+      option.textContent = tahun;
+      tahunFilter.appendChild(option);
+    });
+  }
+
+  function hapusTransaksi(index) {
+    const id = data[index].id;
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksiFirestore(id);
+    }
+  }
+
+  document.getElementById("formTransaksi").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) {
+      alert("Harap lengkapi semua data!");
+      return;
+    }
+
+    tambahTransaksi({ nama, tanggal, keterangan, jenis, jumlah });
+    this.reset();
+  });
+
+  document.getElementById("bulanFilter").addEventListener('change', updateTabel);
+  document.getElementById("tahunFilter").addEventListener('change', updateTabel);
+
+  ambilDataFirestore();
+
+  window.getData = () => data;
+  window.getSaldoAwal = () => saldoAwalTahun;
+</script>
+
+
+</body> -->
   <script>
  function exportTableToExcel(tabelId, namaFile = 'data') {
   const table = document.getElementById(tabelId);
@@ -438,11 +659,341 @@
   made by: <strong>Gabriela Dewani</strong>
 </div>
 
-</body>
-</html>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const transaksiCol = collection(db, "transaksi");
+  const saldoCol = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function ambilDataFirestore() {
+    const querySnapshot = await getDocs(transaksiCol);
+    data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+
+    const saldoSnapshot = await getDocs(saldoCol);
+    saldoAwalTahun = {};
+    saldoSnapshot.forEach((doc) => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    populateTahunFilter();
+    updateTabel();
+  }
+
+  async function simpanSaldoAwal() {
+    const tahun = document.getElementById("tahunFilter").value;
+    const jumlah = parseInt(document.getElementById("saldoAwal").value) || 0;
+    if (!tahun) return alert("Pilih tahun terlebih dahulu");
+    await setDoc(doc(saldoCol, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiCol, obj);
+    ambilDataFirestore();
+  }
+
+  async function hapusTransaksiFirestore(id) {
+    await deleteDoc(doc(transaksiCol, id));
+    ambilDataFirestore();
+  }
+
+  function populateTahunFilter() {
+    const tahunSet = new Set();
+    data.forEach(item => {
+      const tahun = new Date(item.tanggal).getFullYear();
+      tahunSet.add(tahun);
+    });
+    const tahunFilter = document.getElementById('tahunFilter');
+    tahunFilter.innerHTML = '';
+    [...tahunSet].sort().forEach(tahun => {
+      const option = document.createElement('option');
+      option.value = tahun;
+      option.textContent = tahun;
+      tahunFilter.appendChild(option);
+    });
+  }
+
+  function hapusTransaksi(index) {
+    const id = data[index].id;
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksiFirestore(id);
+    }
+  }
+
+  document.getElementById("formTransaksi").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) {
+      alert("Harap lengkapi semua data!");
+      return;
+    }
+
+    tambahTransaksi({ nama, tanggal, keterangan, jenis, jumlah });
+    this.reset();
+  });
+
+  document.getElementById("bulanFilter").addEventListener('change', updateTabel);
+  document.getElementById("tahunFilter").addEventListener('change', updateTabel);
+
+  ambilDataFirestore();
+
+  window.getData = () => data;
+  window.getSaldoAwal = () => saldoAwalTahun;
+</script>
+
 
 </body>
 </html>
+
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const transaksiCol = collection(db, "transaksi");
+  const saldoCol = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function ambilDataFirestore() {
+    const querySnapshot = await getDocs(transaksiCol);
+    data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+
+    const saldoSnapshot = await getDocs(saldoCol);
+    saldoAwalTahun = {};
+    saldoSnapshot.forEach((doc) => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    populateTahunFilter();
+    updateTabel();
+  }
+
+  async function simpanSaldoAwal() {
+    const tahun = document.getElementById("tahunFilter").value;
+    const jumlah = parseInt(document.getElementById("saldoAwal").value) || 0;
+    if (!tahun) return alert("Pilih tahun terlebih dahulu");
+    await setDoc(doc(saldoCol, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiCol, obj);
+    ambilDataFirestore();
+  }
+
+  async function hapusTransaksiFirestore(id) {
+    await deleteDoc(doc(transaksiCol, id));
+    ambilDataFirestore();
+  }
+
+  function populateTahunFilter() {
+    const tahunSet = new Set();
+    data.forEach(item => {
+      const tahun = new Date(item.tanggal).getFullYear();
+      tahunSet.add(tahun);
+    });
+    const tahunFilter = document.getElementById('tahunFilter');
+    tahunFilter.innerHTML = '';
+    [...tahunSet].sort().forEach(tahun => {
+      const option = document.createElement('option');
+      option.value = tahun;
+      option.textContent = tahun;
+      tahunFilter.appendChild(option);
+    });
+  }
+
+  function hapusTransaksi(index) {
+    const id = data[index].id;
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksiFirestore(id);
+    }
+  }
+
+  document.getElementById("formTransaksi").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) {
+      alert("Harap lengkapi semua data!");
+      return;
+    }
+
+    tambahTransaksi({ nama, tanggal, keterangan, jenis, jumlah });
+    this.reset();
+  });
+
+  document.getElementById("bulanFilter").addEventListener('change', updateTabel);
+  document.getElementById("tahunFilter").addEventListener('change', updateTabel);
+
+  ambilDataFirestore();
+
+  window.getData = () => data;
+  window.getSaldoAwal = () => saldoAwalTahun;
+</script>
+
+
+</body>
+</html>
+
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const transaksiCol = collection(db, "transaksi");
+  const saldoCol = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function ambilDataFirestore() {
+    const querySnapshot = await getDocs(transaksiCol);
+    data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+    });
+
+    const saldoSnapshot = await getDocs(saldoCol);
+    saldoAwalTahun = {};
+    saldoSnapshot.forEach((doc) => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    populateTahunFilter();
+    updateTabel();
+  }
+
+  async function simpanSaldoAwal() {
+    const tahun = document.getElementById("tahunFilter").value;
+    const jumlah = parseInt(document.getElementById("saldoAwal").value) || 0;
+    if (!tahun) return alert("Pilih tahun terlebih dahulu");
+    await setDoc(doc(saldoCol, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiCol, obj);
+    ambilDataFirestore();
+  }
+
+  async function hapusTransaksiFirestore(id) {
+    await deleteDoc(doc(transaksiCol, id));
+    ambilDataFirestore();
+  }
+
+  function populateTahunFilter() {
+    const tahunSet = new Set();
+    data.forEach(item => {
+      const tahun = new Date(item.tanggal).getFullYear();
+      tahunSet.add(tahun);
+    });
+    const tahunFilter = document.getElementById('tahunFilter');
+    tahunFilter.innerHTML = '';
+    [...tahunSet].sort().forEach(tahun => {
+      const option = document.createElement('option');
+      option.value = tahun;
+      option.textContent = tahun;
+      tahunFilter.appendChild(option);
+    });
+  }
+
+  function hapusTransaksi(index) {
+    const id = data[index].id;
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksiFirestore(id);
+    }
+  }
+
+  document.getElementById("formTransaksi").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) {
+      alert("Harap lengkapi semua data!");
+      return;
+    }
+
+    tambahTransaksi({ nama, tanggal, keterangan, jenis, jumlah });
+    this.reset();
+  });
+
+  document.getElementById("bulanFilter").addEventListener('change', updateTabel);
+  document.getElementById("tahunFilter").addEventListener('change', updateTabel);
+
+  ambilDataFirestore();
+
+  window.getData = () => data;
+  window.getSaldoAwal = () => saldoAwalTahun;
+</script>
+
 
 </body>
 </html>
@@ -451,8 +1002,8 @@
   const tahunFilter = document.getElementById('tahunFilter');
   const saldoAwalInput = document.getElementById('saldoAwal');
 
-  let data = JSON.parse(localStorage.getItem("keuangan")) || [];
-  let saldoAwalTahun = JSON.parse(localStorage.getItem("saldoAwalTahun")) || {};
+  
+  
 
   function simpanSaldoAwal() {
     const tahun = tahunFilter.value;
