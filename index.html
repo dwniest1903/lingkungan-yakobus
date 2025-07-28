@@ -455,6 +455,17 @@
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
   const db = firebase.firestore();
+let data = [];
+db.collection("transaksi").onSnapshot((snapshot) => {
+  data = [];
+  snapshot.forEach((doc) => {
+    data.push(doc.data());
+  });
+  localStorage.setItem("keuangan", JSON.stringify(data));
+  if (typeof populateTahunFilter === 'function') populateTahunFilter();
+  if (typeof updateTabel === 'function') updateTabel();
+});
+
 
   // Tambahkan ke Firestore saat transaksi disimpan
   const form = document.getElementById("formTransaksi");
