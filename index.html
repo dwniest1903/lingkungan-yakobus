@@ -178,30 +178,10 @@
     }
   </style>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-
-
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  
-const firebaseConfig = {
-  apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
-  authDomain: "lingkungan-yakobus.firebaseapp.com",
-  projectId: "lingkungan-yakobus",
-  storageBucket: "lingkungan-yakobus.firebasestorage.app",
-  messagingSenderId: "521808570205",
-  appId: "1:521808570205:web:970b380cc0130757c76ab4",
-  measurementId: "G-QPRSQF7VV2"
-};
-
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.firebaseDB = db; // Bisa diakses dari script lain
-</script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js"></script>
 
 </head>
 <body>
@@ -461,6 +441,39 @@ const firebaseConfig = {
 ">
   made by: <strong>Gabriela Dewani</strong>
 </div>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.appspot.com",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  const db = firebase.firestore();
+
+  // Tambahkan ke Firestore saat transaksi disimpan
+  const form = document.getElementById("formTransaksi");
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const nama = document.getElementById("nama").value;
+    const tanggal = document.getElementById("tanggal").value;
+    const keterangan = document.getElementById("keterangan").value;
+    const jenis = document.getElementById("jenis").value;
+    const jumlah = parseInt(document.getElementById("jumlah").value);
+
+    if (!tanggal || !keterangan || !jenis || !jumlah) return;
+
+    const item = { nama, tanggal, keterangan, jenis, jumlah };
+    db.collection("transaksi").add(item)
+      .then(() => console.log("Tersimpan ke Firestore"))
+      .catch((err) => console.error("Gagal simpan:", err));
+  });
+</script>
 
 </body>
 </html>
