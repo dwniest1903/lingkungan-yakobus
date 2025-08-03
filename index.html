@@ -592,6 +592,7 @@
     const cover = document.getElementById("cover");
     cover.style.opacity = "0";
     setTimeout(() => cover.style.display = "none", 500);
+    window.firestore.loadFirestoreData();
   }
 
   // Saat halaman selesai dimuat
