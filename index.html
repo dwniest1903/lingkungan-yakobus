@@ -386,7 +386,7 @@
     <input type="text" id="keterangan" placeholder="Keterangan" required>
     <select id="jenis" required>
       <option value="">-- Pilih Jenis --</option>
-      <option value="masuk_ppks">Pemasukan PPKS</option>
+      <option value="masuk_ppks">Pemasukan PPKS + Pastoral</option>
       <option value="masuk_sukarela">Pemasukan Sukarela</option>
       <option value="keluar">Pengeluaran</option>
     </select>
@@ -419,7 +419,7 @@
     <label for="tahunFilter">Tahun:</label>
     <select id="tahunFilter"></select>
 
-    <p>Total Pemasukan PPKS: Rp <span id="totalPPKS">0</span></p>
+    <p>Total Pemasukan PPKS + Pastoral: Rp <span id="totalPPKS">0</span></p>
     <p>Total Pemasukan Sukarela: Rp <span id="totalSukarela">0</span></p>
     <p>Total Pengeluaran: Rp <span id="totalKeluar">0</span></p>
     <p><strong>Saldo Akhir: Rp <span id="saldo">0</span></strong></p>
@@ -637,7 +637,7 @@
       <td>${item.nama || "-"}</td>
       <td>${item.tanggal}</td>
       <td>${item.keterangan}</td>
-      <td>${item.jenis.replace("masuk_ppks", "Pemasukan PPKS").replace("masuk_sukarela", "Pemasukan Sukarela").replace("keluar", "Pengeluaran")}</td>
+      <td>${item.jenis.replace("masuk_ppks", "Pemasukan PPKS + Pastoral").replace("masuk_sukarela", "Pemasukan Sukarela").replace("keluar", "Pengeluaran")}</td>
       <td>${item.jumlah.toLocaleString("id-ID")}</td>
       <td><button class="hapus-btn" onclick="hapusTransaksi(${index})">Hapus</button></td>
     </tr>`;
@@ -736,7 +736,7 @@
         }
       }
 
-      let html = `<h3>📊 ${jenis === "masuk_ppks" ? "IURAN PPKS" : jenis === "masuk_sukarela" ? "IURAN SUKARELA" : "PENGELUARAN"}</h3>`;
+      let html = `<h3>📊 ${jenis === "masuk_ppks" ? "IURAN PPKS + Pastoral" : jenis === "masuk_sukarela" ? "IURAN SUKARELA" : "PENGELUARAN"}</h3>`;
       html += `<table><thead><tr><th>${jenis === "keluar" ? "Keterangan" : "Nama"}</th><th>Tahun</th>`;
       bulanNama.forEach(b => html += `<th>${b}</th>`);
       html += `<th>Total</th></tr></thead><tbody>`;
