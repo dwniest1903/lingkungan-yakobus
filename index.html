@@ -3,6 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <title>Aplikasi Bendahara Web</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCykg4g-M-mRem_HdSF2kP8bCdnYyDpcIg",
+    authDomain: "lingkungan-yakobus.firebaseapp.com",
+    projectId: "lingkungan-yakobus",
+    storageBucket: "lingkungan-yakobus.firebasestorage.app",
+    messagingSenderId: "521808570205",
+    appId: "1:521808570205:web:970b380cc0130757c76ab4",
+    measurementId: "G-QPRSQF7VV2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const transaksiRef = collection(db, "transaksi");
+  const saldoRef = collection(db, "saldo");
+
+  let data = [];
+  let saldoAwalTahun = {};
+
+  async function loadFirestoreData() {
+    const transaksiSnap = await getDocs(transaksiRef);
+    data = transaksiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const saldoSnap = await getDocs(saldoRef);
+    saldoAwalTahun = {};
+    saldoSnap.forEach(doc => {
+      saldoAwalTahun[doc.id] = doc.data().jumlah;
+    });
+
+    window.updateTabel && updateTabel();
+    window.populateTahunFilter && populateTahunFilter();
+  }
+
+  async function simpanSaldoAwal(tahun, jumlah) {
+    await setDoc(doc(saldoRef, tahun), { jumlah });
+    saldoAwalTahun[tahun] = jumlah;
+    updateTabel();
+  }
+
+  async function tambahTransaksi(obj) {
+    await addDoc(transaksiRef, obj);
+    await loadFirestoreData();
+  }
+
+  async function hapusTransaksiById(id) {
+    await deleteDoc(doc(db, "transaksi", id));
+    await loadFirestoreData();
+  }
+
+  window.firestore = {
+    tambahTransaksi,
+    hapusTransaksiById,
+    simpanSaldoAwal,
+    loadFirestoreData,
+    get data() { return data; },
+    get saldoAwalTahun() { return saldoAwalTahun; }
+  };
+</script>
+
+  <title>Aplikasi Bendahara Web</title>
   <style>
     :root {
       --bg-light: #fffdf7;
